@@ -19,13 +19,9 @@ namespace ioLabs.Controllers
             var tokenResponse = await _tokenService.RefreshAccessTokenAsync(refreshToken);
             if (tokenResponse != null)
             {
-                // Use the new access token to make your secure API call
                 var accessToken = tokenResponse.AccessToken;
 
-                // Optionally, store the new access and refresh tokens securely
-
-                // Proceed with your API logic using the new access token
-                return Ok("Secure data accessed using refreshed token.");
+                return Ok(accessToken);
             }
             else
             {
