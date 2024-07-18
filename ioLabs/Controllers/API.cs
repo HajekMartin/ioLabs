@@ -61,7 +61,7 @@ namespace ioLabs.Controllers
             dataModel.Request = request;
             dataModel.RefreshToken = "r";
             dataModel.AccessToken = "a";
-            dataModel.User = "u";
+            dataModel.User = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
 
             // Validation
             var validator = new DataModelValidator();
