@@ -71,7 +71,7 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuerSigningKey = true,
         ValidateIssuer = true,
-        //ValidateAudience = true,
+        ValidateAudience = true,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };

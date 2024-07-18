@@ -23,11 +23,11 @@ namespace ioLabs.Controllers
             var dataModel = new DataModel();
             dataModel.RequestTime = DateTime.Now;
             dataModel.Request = request;
-            //dataModel.RefreshToken = ...;
-            //dataModel.AccessToken = ...;
-            
+            dataModel.RefreshToken = "r";
+            dataModel.AccessToken = "a";
+            dataModel.User = "u";
 
-            // Validace
+            // Validation
             var validator = new DataModelValidator();
             var validationResult = validator.Validate(dataModel);
 
@@ -38,13 +38,16 @@ namespace ioLabs.Controllers
 
             _context.DataModels.Add(dataModel);
             _context.SaveChanges();
-            return Ok(dataModel);
+            return Ok("You send: " + dataModel.Request);
         }
 
         [HttpGet("GetMessages")]
-        public IActionResult GetMessages()
+        public IActionResult GetMessages(int page, int pageCount)
         {
-            var output = _context.DataModels.ToList();
+            var output = _context.DataModels
+                .Skip((page - 1) * pageCount)
+                .Take(pageCount)
+                .ToList();
             return Ok(output);
         }
     }
