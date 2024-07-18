@@ -59,8 +59,8 @@ namespace ioLabs.Controllers
             var dataModel = new DataModel();
             dataModel.RequestTime = DateTime.Now;
             dataModel.Request = request;
-            dataModel.RefreshToken = "r";
-            dataModel.AccessToken = "a";
+            dataModel.RefreshToken = "refresh";
+            dataModel.AccessToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             dataModel.User = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
 
             // Validation
