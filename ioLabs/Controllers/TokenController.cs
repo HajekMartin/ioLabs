@@ -22,7 +22,7 @@ namespace ioLabs.Controllers
                 Console.WriteLine(tokenResponse.AccessToken);
                 Console.WriteLine(tokenResponse.RefreshToken);
 
-                return Ok(tokenResponse);
+                return Ok(tokenResponse); // Aplikace už pak nadále s tím naloží sama
             }
             else
             {
