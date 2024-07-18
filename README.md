@@ -1,6 +1,8 @@
+# Zadání
+
 Create simple .NET 6 API app secured with JWT tokens for storing and reading data from singleton service or DB
 
-# API
+## API
 - all endpoints secured with oAuth 2.0 (see below)
 
 - POST saveMessage
@@ -23,7 +25,7 @@ Create simple .NET 6 API app secured with JWT tokens for storing and reading dat
 
 - optionaly integrate swagger
 
-# Data model
+## Data model
 - Data model
 
     - Api Call
@@ -50,7 +52,7 @@ Create simple .NET 6 API app secured with JWT tokens for storing and reading dat
 
   - use migrations
 
-# Security
+## Security
 - API secured with oAuth 2.0 (Authorization Code)
 
   - https://keycloak.stage.iolabs.ch/auth/realms/iotest/.well-known/openid-configuration
@@ -62,3 +64,20 @@ Create simple .NET 6 API app secured with JWT tokens for storing and reading dat
 - username: be.test
 
 - password: test123
+
+# Moje řešení
+- Dle mých odhadů jsem snad vše splnil.
+- Mám dva Controllery API a APISql (tzn i dva contexty).
+  - API je pouze pro uložení do inmemory db.
+  - APISql ukládá do SQLite.
+    - Je tam jen jedna Migrace.
+    - Zároveň jsem ho dělal jako druhý je tudíž lepší aspoň v nějaké struktuře kódu i když ho tam moc není.
+
+- Struktura je snad dle dobrých navyků v .NET.
+
+- Tokeny:
+  - Pro obnovení tokenu slouží endpoint refresh-token.
+
+- Nejasnosti:
+  - Při odeslání dotazu nevím kde mám vzít referesh. Musel bych se doptávat extra asi? Běžně se neposílá tzn neukládám.
+

@@ -3,6 +3,7 @@ using ioLabs.Models;
 using ioLabs.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ioLabs.Controllers
 {
@@ -11,6 +12,7 @@ namespace ioLabs.Controllers
     public class APISql : Controller
     {
         private readonly IoLabsSQLContext _contextSql;
+        private readonly DataModelValidator _validator;
 
         public APISql(IoLabsSQLContext contextSql)
         {
@@ -29,8 +31,7 @@ namespace ioLabs.Controllers
             dataModel.User = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
 
             // Validation
-            var validator = new DataModelValidator();
-            var validationResult = validator.Validate(dataModel);
+            var validationResult = _validator.Validate(dataModel);
 
             if (!validationResult.IsValid)
             {
@@ -39,16 +40,24 @@ namespace ioLabs.Controllers
 
             _contextSql.DataModels.Add(dataModel);
             _contextSql.SaveChanges();
+
             return Ok("You send: " + dataModel.Request);
         }
 
         [HttpGet("GetMessagesSql")]
-        public IActionResult GetMessagesSql(int page, int pageCount)
+        public IActionResult GetMessagesSql(int page, int pageCount, string search)
         {
-            var output = _contextSql.DataModels
+            var query = _contextSql.DataModels.AsQueryable();
+            if (!search.IsNullOrEmpty())
+            {
+                query = query.Where(dm => dm.Request.Contains(search));
+            }
+
+            var output = query
                 .Skip((page - 1) * pageCount)
                 .Take(pageCount)
                 .ToList();
+
             return Ok(output);
         }
     }
