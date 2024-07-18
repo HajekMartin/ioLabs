@@ -1,3 +1,5 @@
+Projekt vytvořený  vrámci výběrového řízení pro https://iolabs.ch/. Jedná se o jejich úlohu. Níže je popsáno zadání co mi bylo poskytnuto, pdo ním moje dojmy.
+
 # Zadání
 
 Create simple .NET 6 API app secured with JWT tokens for storing and reading data from singleton service or DB
