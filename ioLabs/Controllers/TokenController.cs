@@ -19,13 +19,13 @@ namespace ioLabs.Controllers
             var tokenResponse = await _tokenService.RefreshAccessTokenAsync(refreshToken);
             if (tokenResponse != null)
             {
-                var accessToken = tokenResponse.AccessToken;
+                Console.WriteLine(tokenResponse.AccessToken);
+                Console.WriteLine(tokenResponse.RefreshToken);
 
-                return Ok(accessToken);
+                return Ok(tokenResponse);
             }
             else
             {
-                // Handle token refresh failure
                 return Unauthorized("Failed to refresh token.");
             }
         }
