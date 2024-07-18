@@ -54,6 +54,10 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<IoLabsContext>(options =>
     options.UseInMemoryDatabase("ioLabs"));
 
+// SQLite
+builder.Services.AddDbContext<IoLabsSQLContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("IoLabsContext")));
+
 // Add OAuth2.0 JWT authentication
 builder.Services.AddAuthentication(options =>
 {
