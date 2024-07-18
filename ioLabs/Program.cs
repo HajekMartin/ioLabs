@@ -20,16 +20,21 @@ builder.Services.AddDbContext<IoLabsContext>(options =>
 // Add OAuth2.0 authentication
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = OpenIdConnectDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+    options.DefaultScheme = "Cookies";
+    options.DefaultChallengeScheme = "oidc";
 })
-.AddOpenIdConnect(options =>
+.AddCookie("Cookies")
+.AddOpenIdConnect("oidc", options =>
 {
     options.Authority = "https://keycloak.stage.iolabs.ch/auth/realms/iotest/";
     options.ClientId = "test-api";
     options.ClientSecret = "vCDbLdj631sATkfujdg75j9WGzafryKf";
     options.ResponseType = OpenIdConnectResponseType.Code;
+
     options.SaveTokens = true;
+
+    options.CallbackPath = "/signin-oidc";
+
     options.GetClaimsFromUserInfoEndpoint = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -46,7 +51,15 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+        c.OAuthClientId("test-api");
+        c.OAuthClientSecret("vCDbLdj631sATkfujdg75j9WGzafryKf");
+        c.OAuthRealm("https://keycloak.stage.iolabs.ch/auth/realms/iotest/");
+        c.OAuthAppName("My API");
+
+    });
 }
 
 app.UseHttpsRedirection();
