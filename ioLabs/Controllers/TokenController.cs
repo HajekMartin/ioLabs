@@ -12,7 +12,7 @@ namespace ioLabs.Controllers
             _tokenService = tokenService;
         }
 
-        [HttpGet("tokens")]
+        [HttpGet("refresh-token")]
         public async Task<IActionResult> GetSecureData(string refreshToken)
         {
             // Refresh the access token
