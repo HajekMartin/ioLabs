@@ -11,10 +11,12 @@ namespace ioLabs.Controllers
     public class API : ControllerBase
     {
         private readonly IoLabsContext _context;
+        private readonly DataModelValidator _validator;
 
-        public API(IoLabsContext context)
+        public API(IoLabsContext context, DataModelValidator validator)
         {
             _context = context;
+            _validator = validator;
         }
 
         [HttpPost("SaveMessage")]
@@ -28,8 +30,7 @@ namespace ioLabs.Controllers
             dataModel.User = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
 
             // Validation
-            var validator = new DataModelValidator();
-            var validationResult = validator.Validate(dataModel);
+            var validationResult = _validator.Validate(dataModel);
 
             if (!validationResult.IsValid)
             {

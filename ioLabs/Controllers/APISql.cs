@@ -14,9 +14,10 @@ namespace ioLabs.Controllers
         private readonly IoLabsSQLContext _contextSql;
         private readonly DataModelValidator _validator;
 
-        public APISql(IoLabsSQLContext contextSql)
+        public APISql(IoLabsSQLContext contextSql, DataModelValidator validator)
         {
             _contextSql = contextSql;
+            _validator = validator;
         }
 
 

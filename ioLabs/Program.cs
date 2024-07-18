@@ -1,5 +1,6 @@
 using ioLabs.Data;
 using ioLabs.Services;
+using ioLabs.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
@@ -82,6 +83,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddScoped<DataModelValidator>();
 
 builder.Services.AddHttpClient<TokenService>();
 
