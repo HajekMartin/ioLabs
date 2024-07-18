@@ -1,8 +1,10 @@
 using ioLabs.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,37 +13,67 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+
+    // Define the OAuth2 scheme that uses Authorization Code flow
+    c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.OAuth2,
+        Flows = new OpenApiOAuthFlows
+        {
+            AuthorizationCode = new OpenApiOAuthFlow
+            {
+                AuthorizationUrl = new Uri("https://keycloak.stage.iolabs.ch/auth/realms/iotest/protocol/openid-connect/auth"),
+                TokenUrl = new Uri("https://keycloak.stage.iolabs.ch/auth/realms/iotest/protocol/openid-connect/token"),
+                Scopes = new Dictionary<string, string>
+                {
+                    { "openid", "Open ID" }
+                }
+            }
+        }
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "oauth2"
+                }
+            },
+            new[] { "openid" }
+        }
+    });
+});
 
 // In-memory database
 builder.Services.AddDbContext<IoLabsContext>(options =>
     options.UseInMemoryDatabase("ioLabs"));
 
-// Add OAuth2.0 authentication
+// Add OAuth2.0 JWT authentication
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = "Cookies";
-    options.DefaultChallengeScheme = "oidc";
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddCookie("Cookies")
-.AddOpenIdConnect("oidc", options =>
+.AddJwtBearer(options =>
 {
     options.Authority = "https://keycloak.stage.iolabs.ch/auth/realms/iotest/";
-    options.ClientId = "test-api";
-    options.ClientSecret = "vCDbLdj631sATkfujdg75j9WGzafryKf";
-    options.ResponseType = OpenIdConnectResponseType.Code;
+    options.Audience = "account";
 
-    options.SaveTokens = true;
+    options.RequireHttpsMetadata = false; // true
 
-    options.CallbackPath = "/signin-oidc";
-
-    options.GetClaimsFromUserInfoEndpoint = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
+        ValidateIssuerSigningKey = true,
         ValidateIssuer = true,
-        ValidateAudience = true,
+        //ValidateAudience = true,
         ValidateLifetime = true,
-        ValidateIssuerSigningKey = true
+        ClockSkew = TimeSpan.Zero
     };
 });
 
@@ -56,9 +88,12 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
         c.OAuthClientId("test-api");
         c.OAuthClientSecret("vCDbLdj631sATkfujdg75j9WGzafryKf");
-        c.OAuthRealm("https://keycloak.stage.iolabs.ch/auth/realms/iotest/");
+        //c.OAuthRealm("https://keycloak.stage.iolabs.ch/auth/realms/iotest/");
         c.OAuthAppName("My API");
 
+        //c.OAuthUsePkce();  // Pøidejte, pokud je PKCE (Proof Key for Code Exchange) požadováno vaším serverem
+        c.OAuthRealm("iotest");  // Toto by mìlo být ID realm, nikoli URL
+        c.OAuthScopeSeparator(" ");  // Nastavte separátor používaný ve vašich scopes
     });
 }
 
