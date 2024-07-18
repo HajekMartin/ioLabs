@@ -8,23 +8,24 @@ namespace ioLabs.Controllers
 {
     [Authorize]
     [ApiController]
-    public class API : ControllerBase
+    public class APISql : Controller
     {
-        private readonly IoLabsContext _context;
+        private readonly IoLabsSQLContext _contextSql;
 
-        public API(IoLabsContext context)
+        public APISql(IoLabsSQLContext contextSql)
         {
-            _context = context;
+            _contextSql = contextSql;
         }
 
-        [HttpPost("SaveMessage")]
-        public IActionResult SaveMessage(string request)
+
+        [HttpPost("SaveMessageSql")]
+        public IActionResult SaveMessageSql(string request)
         {
             var dataModel = new DataModel();
             dataModel.RequestTime = DateTime.Now;
             dataModel.Request = request;
-            dataModel.RefreshToken = "r";
-            dataModel.AccessToken = "a";
+            dataModel.RefreshToken = "refresh";
+            dataModel.AccessToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             dataModel.User = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
 
             // Validation
@@ -36,15 +37,15 @@ namespace ioLabs.Controllers
                 return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
             }
 
-            _context.DataModels.Add(dataModel);
-            _context.SaveChanges();
+            _contextSql.DataModels.Add(dataModel);
+            _contextSql.SaveChanges();
             return Ok("You send: " + dataModel.Request);
         }
 
-        [HttpGet("GetMessages")]
-        public IActionResult GetMessages(int page, int pageCount)
+        [HttpGet("GetMessagesSql")]
+        public IActionResult GetMessagesSql(int page, int pageCount)
         {
-            var output = _context.DataModels
+            var output = _contextSql.DataModels
                 .Skip((page - 1) * pageCount)
                 .Take(pageCount)
                 .ToList();

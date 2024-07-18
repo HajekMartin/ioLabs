@@ -1,4 +1,5 @@
 using ioLabs.Data;
+using ioLabs.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
@@ -80,6 +81,9 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.FromSeconds(30)
     };
 });
+
+
+builder.Services.AddHttpClient<TokenService>();
 
 var app = builder.Build();
 
